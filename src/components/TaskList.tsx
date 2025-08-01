@@ -9,7 +9,7 @@ interface TaskListProps {
 function TaskList({ tasks, setTasks }: TaskListProps) {
   let [editingIndex, setEditingIndex] = useState<number>(-1);
   let [updatedTask, setUpdatedTask] = useState<string>("");
-  let [toggleSearch, setToggleSearch] = useState<boolean>(false);
+  // let [toggleSearch, setToggleSearch] = useState<boolean>(false);
   let [searchTask, setSearchTask] = useState<string>("");
   let [findIndex, setFindIndex] = useState<number>(-1);
 
@@ -56,23 +56,17 @@ function TaskList({ tasks, setTasks }: TaskListProps) {
 
   const searchText = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTask(event.target.value);
-    setFindIndex(tasks.indexOf(searchTask));
     console.log(findIndex);
   };
 
   const search = () => {
-    setToggleSearch(true);
-    setFindIndex(tasks.indexOf(searchTask));
+    if (tasks.includes(searchTask)) setFindIndex(-1);
+    tasks.map((task, index) => {
+      if (task === searchTask) {
+        setFindIndex(index);
+      }
+    });
     console.log(findIndex);
-    if (findIndex === -1) {
-      setTimeout(() => {
-        setFindIndex(-1);
-        setSearchTask("");
-      }, 7000);
-      setTimeout(() => {
-        setToggleSearch(false);
-      }, 10000);
-    }
   };
 
   const sort = () => {
@@ -94,15 +88,30 @@ function TaskList({ tasks, setTasks }: TaskListProps) {
             <button className="btn btn-warning" onClick={search}>
               <i className="bi bi-search"></i>
             </button>
-            {toggleSearch ? (
+            <span
+              className="text-white input-group-text bg-black"
+              data-bs-theme="dark"
+            >
               <input
                 key="search"
                 type="text"
-                className="text-white input-group-text bg-black"
+                value={searchTask}
+                className="text-white bg-black input-form-text"
+                style={{
+                  border: 0,
+                  outline: 0,
+                }}
                 placeholder="Search Task"
                 onChange={searchText}
               />
-            ) : null}
+              <button
+                className="btn btn-close"
+                onClick={() => {
+                  setFindIndex(-1);
+                  setSearchTask("");
+                }}
+              ></button>
+            </span>
           </span>
         </div>
       </div>
@@ -131,48 +140,82 @@ function TaskList({ tasks, setTasks }: TaskListProps) {
                   </button>
                 </div>
               </li>
-            ) : (
+            ) : findIndex === index ? (
               //if not editing
-              <li
-                key={index}
-                className="bg-black text-white list-group-item d-flex gap-4 justify-content-between w-100"
-              >
-                {index === findIndex ? (
-                  <div className="d-flex gap-2 flex-wrap w-75 text-warning">
-                    <i className="bi bi-lightbulb-fill"></i>
+              //searched list
+              <>
+                <li
+                  key={index}
+                  className="bg-black text-white list-group-item d-flex gap-4 justify-content-between w-100"
+                >
+                  <div className="d-flex gap-2 flex-wrap w-75 text-light">
                     {task}
                   </div>
-                ) : (
+                  <div className="d-flex gap-2 w-auto h-25">
+                    <button
+                      className="btn btn-danger rounded-circle btn-sm"
+                      onClick={() => deleteTask(index)}
+                    >
+                      <i className="bi bi-trash3"></i>
+                    </button>
+                    <button
+                      className="btn btn-info rounded-circle btn-sm"
+                      onClick={() => editTask(index)}
+                    >
+                      <i className="bi bi-pencil-square"></i>
+                    </button>
+                    <button
+                      className="btn btn-dark rounded-circle btn-sm"
+                      onClick={() => moveUp(index)}
+                    >
+                      <i className="bi bi-arrow-up-short"></i>
+                    </button>
+                    <button
+                      className="btn btn-dark rounded-circle btn-sm"
+                      onClick={() => moveDown(index)}
+                    >
+                      <i className="bi bi-arrow-down-short"></i>
+                    </button>
+                  </div>
+                </li>
+              </>
+            ) : findIndex === -1 ? (
+              //not searched, simple display
+              <>
+                <li
+                  key={index}
+                  className="bg-black text-white list-group-item d-flex gap-4 justify-content-between w-100"
+                >
                   <div className="d-flex flex-wrap w-75">{task}</div>
-                )}
-                <div className="d-flex gap-2 w-auto h-25">
-                  <button
-                    className="btn btn-danger rounded-circle btn-sm"
-                    onClick={() => deleteTask(index)}
-                  >
-                    <i className="bi bi-trash3"></i>
-                  </button>
-                  <button
-                    className="btn btn-info rounded-circle btn-sm"
-                    onClick={() => editTask(index)}
-                  >
-                    <i className="bi bi-pencil-square"></i>
-                  </button>
-                  <button
-                    className="btn btn-dark rounded-circle btn-sm"
-                    onClick={() => moveUp(index)}
-                  >
-                    <i className="bi bi-arrow-up-short"></i>
-                  </button>
-                  <button
-                    className="btn btn-dark rounded-circle btn-sm"
-                    onClick={() => moveDown(index)}
-                  >
-                    <i className="bi bi-arrow-down-short"></i>
-                  </button>
-                </div>
-              </li>
-            )
+                  <div className="d-flex gap-2 w-auto h-25">
+                    <button
+                      className="btn btn-danger rounded-circle btn-sm"
+                      onClick={() => deleteTask(index)}
+                    >
+                      <i className="bi bi-trash3"></i>
+                    </button>
+                    <button
+                      className="btn btn-info rounded-circle btn-sm"
+                      onClick={() => editTask(index)}
+                    >
+                      <i className="bi bi-pencil-square"></i>
+                    </button>
+                    <button
+                      className="btn btn-dark rounded-circle btn-sm"
+                      onClick={() => moveUp(index)}
+                    >
+                      <i className="bi bi-arrow-up-short"></i>
+                    </button>
+                    <button
+                      className="btn btn-dark rounded-circle btn-sm"
+                      onClick={() => moveDown(index)}
+                    >
+                      <i className="bi bi-arrow-down-short"></i>
+                    </button>
+                  </div>
+                </li>
+              </>
+            ) : null
           )}
         </ul>
       </div>
