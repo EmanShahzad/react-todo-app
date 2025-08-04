@@ -1,6 +1,9 @@
-import { useContext, useState } from "react";
+// import { useContext, useState } from "react";
+import { useState } from "react";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { TasksContext } from "./TasksProvider";
+// import { TasksContext } from "./TasksProvider";
+import { useAppDispatch } from "../redux/hooks";
+import { addNewTask } from "../redux/features/tasks/taskSlice";
 
 interface HeaderProps {
   tasks: string[];
@@ -8,9 +11,11 @@ interface HeaderProps {
 }
 function Header() {
   //   let [tasks, setTasks] = useState<string[]>(["eat", "drink", "sleep"]);
-  const TaskList = useContext(TasksContext);
-  if (!TaskList) throw new Error("error");
-  const { tasks, setTasks } = TaskList;
+  // const TaskList = useContext(TasksContext);
+  // if (!TaskList) throw new Error("error");
+  // const { tasks, setTasks } = TaskList;
+
+  const dispatch = useAppDispatch();
   let [newTask, setnewTask] = useState<string>("");
 
   const updateText = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,7 +24,7 @@ function Header() {
 
   const addTask = () => {
     if (newTask.trim() !== "") {
-      setTasks([...tasks, newTask]);
+      dispatch(addNewTask(newTask));
       setnewTask("");
     }
   };
