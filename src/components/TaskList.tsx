@@ -1,15 +1,18 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import { TasksContext } from "./TasksProvider";
 
-interface TaskListProps {
-  tasks: string[];
-  setTasks: React.Dispatch<React.SetStateAction<string[]>>;
-}
+// interface TaskListProps {
+//   tasks: string[];
+//   setTasks: React.Dispatch<React.SetStateAction<string[]>>;
+// }
 
-function TaskList({ tasks, setTasks }: TaskListProps) {
+function TaskList() {
+  const TaskList = useContext(TasksContext);
+  if (!TaskList) throw new Error("error");
+  const { tasks, setTasks } = TaskList;
   let [editingIndex, setEditingIndex] = useState<number>(-1);
   let [updatedTask, setUpdatedTask] = useState<string>("");
-  // let [toggleSearch, setToggleSearch] = useState<boolean>(false);
   let [searchTask, setSearchTask] = useState<string>("");
   let [findIndex, setFindIndex] = useState<number>(-1);
 
@@ -70,7 +73,9 @@ function TaskList({ tasks, setTasks }: TaskListProps) {
   };
 
   const sort = () => {
-    setTasks([...tasks].sort());
+    if (findIndex === -1) {
+      setTasks([...tasks].sort());
+    }
     console.log(tasks);
   };
 

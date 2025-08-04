@@ -1,12 +1,16 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import { TasksContext } from "./TasksProvider";
 
 interface HeaderProps {
   tasks: string[];
   setTasks: React.Dispatch<React.SetStateAction<string[]>>;
 }
-function Header({ tasks, setTasks }: HeaderProps) {
+function Header() {
   //   let [tasks, setTasks] = useState<string[]>(["eat", "drink", "sleep"]);
+  const TaskList = useContext(TasksContext);
+  if (!TaskList) throw new Error("error");
+  const { tasks, setTasks } = TaskList;
   let [newTask, setnewTask] = useState<string>("");
 
   const updateText = (event: React.ChangeEvent<HTMLInputElement>) => {
