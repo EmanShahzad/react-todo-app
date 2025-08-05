@@ -17,7 +17,7 @@ export const taskSlice = createSlice({
     addNewTask: (state, action: PayloadAction<string>) => {
       state.tasks.push(action.payload);
     },
-    deleteTask: (state, action: PayloadAction<number>) => {
+    deleteTaskFromStore: (state, action: PayloadAction<number>) => {
       state.tasks = state.tasks.filter(
         (task, index) => index !== action.payload
       );
@@ -30,9 +30,39 @@ export const taskSlice = createSlice({
         index === action.payload.index ? action.payload.updatedText : task
       );
     },
+    moveTaskUp: (
+      state,
+      action: PayloadAction<{ index: number; editingIndex: number }>
+    ) => {
+      const index: number = action.payload.index;
+      const swap: number = index - 1;
+      if (swap < state.tasks.length && action.payload.editingIndex === -1)
+        [state.tasks[index], state.tasks[swap]] = [
+          state.tasks[swap],
+          state.tasks[index],
+        ];
+    },
+    moveTaskDown: (
+      state,
+      action: PayloadAction<{ index: number; editingIndex: number }>
+    ) => {
+      const index: number = action.payload.index;
+      const swap: number = index + 1;
+      if (swap < state.tasks.length && action.payload.editingIndex === -1)
+        [state.tasks[index], state.tasks[swap]] = [
+          state.tasks[swap],
+          state.tasks[index],
+        ];
+    },
   },
 });
 
-export const { addNewTask, deleteTask, updateTask } = taskSlice.actions;
+export const {
+  addNewTask,
+  deleteTaskFromStore,
+  updateTask,
+  moveTaskUp,
+  moveTaskDown,
+} = taskSlice.actions;
 export const tasks = (state: RootState) => state.tasks;
 export default taskSlice.reducer;

@@ -1,6 +1,14 @@
-import { useContext, useState } from "react";
+// import { useContext, useState } from "react";
+import { useState } from "react";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { TasksContext } from "./TasksProvider";
+// import { TasksContext } from "./TasksProvider";
+import {
+  deleteTaskFromStore,
+  updateTask,
+  moveTaskUp,
+  moveTaskDown,
+} from "../redux/features/tasks/taskSlice";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 
 // interface TaskListProps {
 //   tasks: string[];
@@ -8,16 +16,20 @@ import { TasksContext } from "./TasksProvider";
 // }
 
 function TaskList() {
-  const TaskList = useContext(TasksContext);
-  if (!TaskList) throw new Error("error");
-  const { tasks, setTasks } = TaskList;
+  // const TaskList = useContext(TasksContext);
+  // if (!TaskList) throw new Error("error");
+  // const { tasks, setTasks } = TaskList;
+
+  const dispatch = useAppDispatch();
+  const tasks = useAppSelector((state) => state.tasks.tasks);
   let [editingIndex, setEditingIndex] = useState<number>(-1);
   let [updatedTask, setUpdatedTask] = useState<string>("");
   let [searchTask, setSearchTask] = useState<string>("");
   let [findIndex, setFindIndex] = useState<number>(-1);
 
   const deleteTask = (deleteIndex: number) => {
-    setTasks(tasks.filter((task, index) => index !== deleteIndex));
+    dispatch(deleteTaskFromStore(deleteIndex));
+    // setTasks(tasks.filter((task, index) => index !== deleteIndex));
   };
 
   const editTask = (editingIndex: number) => {
@@ -33,27 +45,20 @@ function TaskList() {
   };
 
   const saveTask = () => {
-    setTasks(
-      tasks.map((task, index) => (index === editingIndex ? updatedTask : task))
-    );
+    // setTasks(
+    //   tasks.map((task, index) => (index === editingIndex ? updatedTask : task))
+    // );
+    dispatch(updateTask({ index: editingIndex, updatedText: updatedTask }));
     setEditingIndex(-1);
   };
 
   const moveUp = (index: number) => {
-    const swap: number = index - 1;
-    let tempArr = [...tasks];
-    if (index > 0 && editingIndex === -1)
-      [tempArr[index], tempArr[swap]] = [tempArr[swap], tempArr[index]];
-    setTasks(tempArr);
+    dispatch(moveTaskUp({ index, editingIndex }));
     console.log(tasks);
   };
 
   const moveDown = (index: number) => {
-    const swap: number = index + 1;
-    let tempArr = [...tasks];
-    if (swap < tasks.length && editingIndex === -1)
-      [tempArr[index], tempArr[swap]] = [tempArr[swap], tempArr[index]];
-    setTasks(tempArr);
+    dispatch(moveTaskDown({ index, editingIndex }));
     console.log(tasks);
   };
 
@@ -74,7 +79,7 @@ function TaskList() {
 
   const sort = () => {
     if (findIndex === -1) {
-      setTasks([...tasks].sort());
+      [...tasks].sort();
     }
     console.log(tasks);
   };
@@ -186,40 +191,39 @@ function TaskList() {
               </>
             ) : findIndex === -1 ? (
               //not searched, simple display
-              <>
-                <li
-                  key={index}
-                  className="bg-black text-white list-group-item d-flex gap-4 justify-content-between w-100"
-                >
-                  <div className="d-flex flex-wrap w-75">{task}</div>
-                  <div className="d-flex gap-2 w-auto h-25">
-                    <button
-                      className="btn btn-danger rounded-circle btn-sm"
-                      onClick={() => deleteTask(index)}
-                    >
-                      <i className="bi bi-trash3"></i>
-                    </button>
-                    <button
-                      className="btn btn-info rounded-circle btn-sm"
-                      onClick={() => editTask(index)}
-                    >
-                      <i className="bi bi-pencil-square"></i>
-                    </button>
-                    <button
-                      className="btn btn-dark rounded-circle btn-sm"
-                      onClick={() => moveUp(index)}
-                    >
-                      <i className="bi bi-arrow-up-short"></i>
-                    </button>
-                    <button
-                      className="btn btn-dark rounded-circle btn-sm"
-                      onClick={() => moveDown(index)}
-                    >
-                      <i className="bi bi-arrow-down-short"></i>
-                    </button>
-                  </div>
-                </li>
-              </>
+
+              <li
+                key={index}
+                className="bg-black text-white list-group-item d-flex gap-4 justify-content-between w-100"
+              >
+                <div className="d-flex flex-wrap w-75">{task}</div>
+                <div className="d-flex gap-2 w-auto h-25">
+                  <button
+                    className="btn btn-danger rounded-circle btn-sm"
+                    onClick={() => deleteTask(index)}
+                  >
+                    <i className="bi bi-trash3"></i>
+                  </button>
+                  <button
+                    className="btn btn-info rounded-circle btn-sm"
+                    onClick={() => editTask(index)}
+                  >
+                    <i className="bi bi-pencil-square"></i>
+                  </button>
+                  <button
+                    className="btn btn-dark rounded-circle btn-sm"
+                    onClick={() => moveUp(index)}
+                  >
+                    <i className="bi bi-arrow-up-short"></i>
+                  </button>
+                  <button
+                    className="btn btn-dark rounded-circle btn-sm"
+                    onClick={() => moveDown(index)}
+                  >
+                    <i className="bi bi-arrow-down-short"></i>
+                  </button>
+                </div>
+              </li>
             ) : null
           )}
         </ul>
